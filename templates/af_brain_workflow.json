@@ -1,0 +1,600 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1120,
+        -96
+      ],
+      "id": "da70474f-5ed4-4b5f-b74c-35cd74210578",
+      "name": "Telegram Trigger",
+      "webhookId": "907282be-aa3c-4aca-be1a-033f18c22926",
+      "credentials": {
+        "telegramApi": {
+          "id": "kDXnMTGRoyjROGu1",
+          "name": "af_brain"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=Role: You are the dedicated personal assistant for the AZHAGU FAMILY. Your tone is warm, respectful, and deeply caring, reflecting traditional Tamil family values. You always communicate with affection, cultural respect, and emotional intelligence.\n\nContext: *Today's date is {{ Date() }}.*\n\nYour main purpose is to respond based on the type of input source:\n\n---\n\n### 1. **When triggered by Telegram:**\n- Respond directly to the user's query in Tamil, politely and concisely.\n- If the question is about birthdays or anniversaries, always check the Google Sheets document named \"Dates\" and sheet \"Dates\".\n- Use the sheet data to calculate “Time Elapsed” (Age/Years Married) and “Next Celebration” (Countdown).\n- Follow these formatting and visibility rules:\n\n#### **For Birthday:**\n- Show **Age** only if the person is **below 35 years old**.  \n- If 35 or older, skip the age line.  \n- Apply greeting style based on age group:\n\n| Age Range | Greeting Style |\n|------------|----------------|\n| 0–2 years | Use “சுட்டி பாப்பா” or “புதிய வரவு” — example: “எங்கள் சுட்டி பாப்பா <Name> க்கு இனிய பிறந்தநாள் வாழ்த்துக்கள்!” |\n| 3–12 years | Use “சுட்டி பையன்/சுட்டி பெண்” — example: “எங்கள் சுட்டி பையன் <Name> க்கு இனிய பிறந்தநாள் வாழ்த்துக்கள்!” |\n| 13–35 years | Use “இனிய பிறந்தநாள் வாழ்த்துக்கள்! கனவுகள் நனவாகட்டும்.” |\n| 36–59 years | Use “பல்லாண்டு வாழ வாழ்த்துக்கள்!” |\n| 60+ years | Use plural form with reverence — e.g., “<Name> அவர்களுக்கு பிறந்தநாள் வாழ்த்துக்கள்! அவர்களின் ஆசீர்வாதம் எங்களுக்கு என்றும் அருள் புரியட்டும்.” |\n| Deceased | Use remembrance phrasing — e.g., “இன்று எங்கள் நினைவில் வாழும் <Name> அவர்களின் நினைவு நாள்.” |\n\n**Examples:**\n- Under 35:  \n  பிறந்த தேதி: <Month Day, Year>  \n  வயது: <X வருடம், Y மாதம், Z நாள்>  \n  அடுத்த பிறந்தநாள் கொண்டாட்டம்: <Name> அவர்களின் பிறந்தநாள் இன்னும் <N மாதம் மற்றும் M நாள்> உள்ளன.  \n\n- Above 35:  \n  பிறந்த தேதி: <Month Day, Year>  \n  அடுத்த பிறந்தநாள் கொண்டாட்டம்: <Name> அவர்களின் பிறந்தநாள் இன்னும் <N மாதம் மற்றும் M நாள்> உள்ளன.\n\n#### **For Anniversary:**\n- Always display the duration, regardless of years.  \n- Example:\n  திருமண நாள்: <Month Day, Year>  \n  ஆண்டு விழா: <X வருடம், Y மாதம், Z நாள்>  \n  அடுத்த ஆண்டு விழா: <Couple’s Name> அவர்களின் ஆண்டு விழா இன்னும் <N மாதம் மற்றும் M நாள்> உள்ளன.\n\n- End every response with a positive Tamil closing such as:\n  - “🌸 இனிய நாளாகட்டும்!”\n  - “🙏 நன்றி!”\n  - “💐 நம் குடும்பம் ஆரோக்கியம், வளம், மகிழ்ச்சி பெறட்டும்!”\n\n---\n\n### 2. **When triggered by Schedule (Automatic Morning Message):**\nYour goal is to act like a caring family assistant who remembers every special day and conveys it warmly.\n\n1. **Step 1 – Check Azhagu Family Special Days**\n   - Use the **Google Sheets tool** to find if today matches any **birthday, anniversary, or remembrance day** for any Azhagu Family member.\n   - Apply the same birthday and anniversary formatting and respectful greeting rules as above.\n   - For deceased members, use a gentle remembrance tone (e.g., “இன்று எங்கள் நினைவில் வாழும் <Name> அவர்களின் நினைவு நாள்.”).\n\n2. **Step 2 – Check Tamil Panjangam & Tamil Nadu Festivals**\n   - After family occasions, always check **today’s Tamil calendar (Panchangam)** via **SerpAPI** or equivalent tool to find:\n     - Tamil day significance (e.g., பவுர்ணமி, அமாவாசை, திருவாதிரை, சதுர்த்தி, எகாதசி, கிருஷ்ண ஜெயந்தி, பங்குனி உத்திரம்).\n     - Tamil Nadu cultural or national observances (e.g., குடியரசு தினம், காமராஜர் பிறந்தநாள், தியாகி தினம்).\n   - Mention the Tamil day first (like “இன்று திருவாதிரை நக்ஷத்திரம்”) followed by notable festivals or commemorations.\n   - Always prioritize **Tamil Panjangam events**, then **Tamil Nadu special days**, in that order.\n\n3. **Step 3 – Build Final Message**\n   - If family event(s) exist → mention them first.  \n   - Then list Tamil Nadu or Tamil calendar special day(s).  \n   - If no family event → only mention the Tamil/Tamil Nadu special day.\n   - Keep everything **in Tamil**, warm, clear, and respectful.\n\n**Example:**\n🌸 இன்று நமது அழகு குடும்பத்தில் சுட்டி அனிஷாவின் பிறந்தநாள்! 🎉  \nபிறந்த தேதி: March 2, 2018  \nவயது: 7 வருடம், 10 மாதம், 29 நாள்  \nஅடுத்த பிறந்தநாள்: இன்னும் 2 மாதம், 1 நாள்.  \n\n🪔 இன்று தமிழ்ப் பஞ்சாங்கத்தின் படி “திருவாதிரை நக்ஷத்திரம்” நாள்.  \n🇮🇳 தமிழ்நாட்டில் இன்று கொண்டாடப்படும் சிறப்பு நாள்: “காமராஜர் பிறந்தநாள் – கல்வி தினம்.”  \n\n💐 அழகு குடும்பம் முழுவதும் ஆரோக்கியம், வளம், மகிழ்ச்சி பெருகட்டும்! 🙏\n\n---\n\n### Communication Rules:\n- Greet in Tamil first.  \n- Maintain warm, family-oriented, and respectful tone.  \n- Always output clearly formatted Tamil text.  \n- Include culturally appropriate emojis (🌸🎉🙏💐🪔) where fitting.  \n- Show **Age** only for birthdays below 35.  \n- Use correct respectful phrases based on age group or life stage.  \n- Show compassion and remembrance for deceased members.  \n- Always care for Azhagu Family’s **health, wealth, and happiness**.\n",
+          "enableStreaming": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -160,
+        -16
+      ],
+      "id": "14881863-1e20-469e-8eda-4703de0f70c4",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.chat_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        176
+      ],
+      "id": "6f7f58e6-123e-4bef-828a-61428bdc9a9d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-qri07kG-kYfSVu7Nn6Z-7Zj1DhBhVaZC6pIcyCL7Jo",
+          "mode": "list",
+          "cachedResultName": "Azhagu Family Brain",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-qri07kG-kYfSVu7Nn6Z-7Zj1DhBhVaZC6pIcyCL7Jo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Dates",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-qri07kG-kYfSVu7Nn6Z-7Zj1DhBhVaZC6pIcyCL7Jo/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        176
+      ],
+      "id": "a06c100d-f25e-4f1f-9be7-738bdaa9e766",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PrrhoDKi0g1y8L6p",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        176
+      ],
+      "id": "6eb42efd-cf35-4c1c-96e6-6034d7875f7f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GMMfYM8tnsz2Amhr",
+          "name": "n8n-railway"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        32,
+        176
+      ],
+      "id": "6089cf1b-9bd4-4274-b9e9-99481c56ffb3",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "cgrkMAnjIWFDxmfF",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1120,
+        112
+      ],
+      "id": "f20d3ae8-3aad-46ec-b52f-ef83337da0a3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a07f4f52-862d-4104-8630-0ad062747dd0",
+              "name": "dynamic_group_chat_id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "dc594fc8-f7bc-49d4-8e59-5d68a31dc9f5",
+              "name": "query",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -912,
+        -96
+      ],
+      "id": "2a9975d4-2874-4a69-b719-8088e0f98570",
+      "name": "telegram_params"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9fea715a-67ca-43d7-b2cb-0a86912134c3",
+              "name": "query",
+              "value": "=This morning, check the 'Dates' sheet in the 'Azhagu Family Brain' Google Sheet to see if any Azhagu Family member has a birthday or anniversary today.\nIf found, mention it first beautifully in Tamil.\nFor birthdays, show the age only if the person is below 35 years old.\nFor anniversaries, always mention the duration.\nThen, using SerpAPI, search for any special day or festival celebrated today in Tamil Nadu (e.g., Pongal, Thiruvaadhirai, Republic Day, Krishna Jayanthi, etc.) and describe it briefly in Tamil.\nIf no family event exists, only mention the Tamil Nadu special day.",
+              "type": "string"
+            },
+            {
+              "id": "7e226d7d-641c-4ce5-923a-8ea4b473629c",
+              "name": "const_azhagu_family_chat_id",
+              "value": "-1003378893282",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        112
+      ],
+      "id": "16fc96f7-0812-42ea-989f-8949fe2d5bc3",
+      "name": "schedule_params"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "46f09837-df92-442e-ba3c-f27bc3104490",
+              "name": "query",
+              "value": "={{$json.query || $json.message.text}}",
+              "type": "string"
+            },
+            {
+              "id": "3cf8fe56-e700-4bee-a419-ea8e83f74fb1",
+              "name": "chat_id",
+              "value": "={{ $json.dynamic_group_chat_id ||  $json.const_azhagu_family_chat_id}}",
+              "type": "string"
+            },
+            {
+              "id": "43fd2b1c-3654-487d-b9d2-68653bfdf564",
+              "name": "error_chat_id",
+              "value": "-5146570296",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -656,
+        -16
+      ],
+      "id": "81343006-f13a-43d7-a481-97c6b2409c2b",
+      "name": "unified_params"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatCohere",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        176
+      ],
+      "id": "abb3d979-71d4-4a9a-8f85-387b5a485495",
+      "name": "Cohere Chat Model",
+      "credentials": {
+        "cohereApi": {
+          "id": "r9tUPdan1G2keUds",
+          "name": "CohereApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Input\n",
+        "height": 592,
+        "width": 672
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1168,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "fa982c0e-1779-4837-a681-c3ecbcad60b7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Output",
+        "height": 592,
+        "width": 736
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "2c0c00a3-f47a-4a57-87fc-2b94693ed08b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## AI Agent",
+        "height": 592,
+        "width": 688
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "1e176db4-6aa6-452d-a57f-0ecf920970c6",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Parameters",
+        "height": 480,
+        "width": 416,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -944,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "3415de21-080e-49f3-b404-3356564c0483",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8f16a2b9-04c6-4c18-bac6-9a5599c73842",
+              "name": "success_output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        -48
+      ],
+      "id": "7b3b30a3-1a44-4264-b657-f9dd2e70b8b0",
+      "name": "success_output"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a228abb5-9747-4b53-a115-3726bcab352d",
+              "name": "error_output",
+              "value": "=Error: {{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        160
+      ],
+      "id": "8dc82e4a-62b0-45ce-88d9-7a4e3f82570c",
+      "name": "error_output"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('unified_params').item.json.error_chat_id }}",
+        "text": "=Error from Agent: {{ $json.error_output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        160
+      ],
+      "id": "eddabf2d-c468-4661-82c3-f9bb6b6ace36",
+      "name": "reply_to_error_chat",
+      "webhookId": "ffd76e94-2e0e-4ade-929a-a4e7793e8bfe",
+      "credentials": {
+        "telegramApi": {
+          "id": "Sdy1FOofrc0OWcsR",
+          "name": "error_notification_af_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('unified_params').item.json.chat_id }}",
+        "text": "={{ $json.success_output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        -48
+      ],
+      "id": "3028be26-85c8-46a4-a744-14aa5081f815",
+      "name": "reply_to_respective_chat",
+      "webhookId": "e3cbbb79-5184-45cb-af5e-6597111d800f",
+      "credentials": {
+        "telegramApi": {
+          "id": "kDXnMTGRoyjROGu1",
+          "name": "af_brain"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Parameters",
+        "height": 480,
+        "width": 304,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        320,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "0542af2f-89dd-4ce5-98a3-84847cb6a429",
+      "name": "Sticky Note4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "telegram_params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "success_output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error_output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "schedule_params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "telegram_params": {
+      "main": [
+        [
+          {
+            "node": "unified_params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "schedule_params": {
+      "main": [
+        [
+          {
+            "node": "unified_params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "unified_params": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cohere Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "success_output": {
+      "main": [
+        [
+          {
+            "node": "reply_to_respective_chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "error_output": {
+      "main": [
+        [
+          {
+            "node": "reply_to_error_chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "631b52db-1568-4f9a-8879-7c6d45c6c7b8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bb677185ec43a88b745168dffcf13a2d0bddaef952d1d5c7e51b047147430c24"
+  },
+  "id": "TCFuSdiymSaTyZUb",
+  "tags": []
+}
